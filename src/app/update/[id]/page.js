@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -8,7 +7,6 @@ export default function Update({ params }) {
   const id = params.id;
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-
   async function refresh() {
     const resp = await fetch(`http://localhost:9999/topics/${id}`, {
       cache: "no-store",
@@ -17,58 +15,54 @@ export default function Update({ params }) {
     setTitle(topic.title);
     setBody(topic.body);
   }
-
   useEffect(() => {
     refresh();
   }, [id]);
-
   return (
-    <>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          const title = e.target.title.value;
-          const body = e.target.body.value;
-          const resp = await fetch(`http://localhost:9999/topics/${id}`, {
-            method: "PATCH",
-            body: JSON.stringify({ title, body }),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          const topic = await resp.json();
-          const lastCreateId = topic.id;
-          const url = `read/${lastCreateId}`;
-          router.push(url);
-          router.refresh();
-        }}
-      >
-        <h2>Update</h2>
-        <p>
-          <input
-            type="text"
-            name="title"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
-            placeholder="title"
-          />
-        </p>
-        <p>
-          <textarea
-            name="body"
-            value={body}
-            onChange={(e) => {
-              setBody(e.target.value);
-            }}
-            placeholder="body"
-          ></textarea>
-        </p>
-        <p>
-          <input type="submit" value="create" />
-        </p>
-      </form>
-    </>
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const title = e.target.title.value;
+        const body = e.target.body.value;
+        const resp = await fetch("http://localhost:9999/topics/" + id, {
+          method: "PATCH",
+          body: JSON.stringify({ title, body }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const topic = await resp.json();
+        const lastId = topic.id;
+        const url = `/read/${lastId}`;
+        router.push(url);
+        router.refresh();
+      }}
+    >
+      <h2>Update</h2>
+      <p>
+        <input
+          type="text"
+          name="title"
+          placeholder="title"
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
+        />
+      </p>
+      <p>
+        <textarea
+          name="body"
+          placeholder="body"
+          value={body}
+          onChange={(e) => {
+            setBody(e.target.value);
+          }}
+        ></textarea>
+      </p>
+      <p>
+        <input type="submit" value="create" />
+      </p>
+    </form>
   );
 }
